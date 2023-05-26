@@ -11,3 +11,29 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.timer {
+  background-color: black;
+  color: white;
+  display: inline-block;
+  padding: 20px;
+  border: 2px solid white;
+  /* max-height: 200px; */
+}
+.timer input {
+  background-color: black;
+  color: white;
+}
+.timer .time {
+  width: 50px;
+}
+
+h6 {
+  display: inline-block;
+  font-size: 15px;
+  padding: 0px;
+  margin: 5px;
+}
+
+.recentTime {
+}
