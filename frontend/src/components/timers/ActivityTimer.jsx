@@ -24,6 +24,7 @@ class ActivityTimer extends Component {
             this.setState((prevState) => {
                 const timers = prevState.timers.map((timer) => {
                   if (timer.index === this.state.currentTimer) {
+                    console.log(timer.recentTimes)
                     return { ...timer, time: this.findTotalTime(timer.recentTimes)};
                   }
                   return timer;
@@ -59,9 +60,7 @@ class ActivityTimer extends Component {
         const { hour, minute, second } = timer.time;
         totalTime += time.conventionalToSeconds(hour, minute, second);
       }
-      console.log(totalTime)
-        // console.log(largestTime)
-        
+
         this.setState({ scale: totalTime + 1 });
     }
       
@@ -76,7 +75,6 @@ class ActivityTimer extends Component {
         let totalTime = `${timer.time.hour}:${timer.time.minute}:${timer.time.second}`;
         const timerColorHeight = clamp(0.2, 3, heightVal / this.state.scale) * 100 + "px";
         const className = (timer.index === this.state.currentTimer) ? 'curTimer' : 'timer'; 
-        console.log(heightVal / this.state.scale)
         return (
             <div className={className} key={timer.index} onClick={(event) => this.changeCurrentTimer(event, timer.index)}>
                 {/* <div className="time" style={{ backgroundColor: timer.color, height: clamp(1, 3, heightVal / this.state.scale) * 100 + "px" }}></div> */}
@@ -104,7 +102,6 @@ class ActivityTimer extends Component {
       this.setState({ veiwAdvancedTimer: veiwTimer });
     }
     changeCurrentTimer = (event, index) => {
-      console.log(event)
       if (event.target === event.currentTarget) {
         const currentTime = new Date();
         const time = {
@@ -207,7 +204,7 @@ class ActivityTimer extends Component {
           timers: prevState.timers.filter((timer) => timer.index !== timerId)
         }));
     };
-    getSendData = () => {
+    sendData = () => {
       const currentDate = new Date();
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth() + 1; // January is 0, so we add 1
@@ -218,6 +215,35 @@ class ActivityTimer extends Component {
       console.log(formattedDate);
       console.log(startTime);
       console.log(endTime);
+      const time = {
+        hour: currentDate.getHours(),
+        minute: currentDate.getMinutes(),
+        second: currentDate.getSeconds(),
+      }
+      const timers = this.state.timers.map((timer) => {
+        if (timer.recentTimes[timer.recentTimes.length - 1].end == null) {
+          const newTimes = timer.recentTimes;
+          newTimes[timer.recentTimes.length - 1] = {start: newTimes[timer.recentTimes.length - 1].start, end: time}
+          return { ...timer, time: this.findTotalTime(newTimes), recentTimes: newTimes };
+        }
+        return timer;
+      });
+      console.log(timers)
+      const workDay = {
+        userId: 1,
+        date: formattedDate,
+        startTime: startTime,
+        endTime: endTime,
+        Timers: timers,
+      }
+      this.props.sendData(workDay);
+      // console.log(this.state.timers)
+    }
+    receiveData = (data) => {
+      this.setState({
+        timers: data.Timers
+      });
+      console.log(data.Timers);
     }
     render() { 
         const timers = this.state.timers.map((timers) => 
@@ -234,7 +260,7 @@ class ActivityTimer extends Component {
               handleCloseScreen={this.handleCloseScreen}
               handleRemoveTimer={this.handleRemoveTimer}
             />
-            <button onClick={this.getSendData}>Save Workday</button>
+            <button onClick={this.sendData}>Save Workday</button>
         </div>
         );
     }

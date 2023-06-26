@@ -12,7 +12,6 @@ export class ColorPicker extends Component {
   render() {
     const selectedColor = this.props.color;
     const bottom = parseFloat(this.props.height) + "px";
-    console.log(bottom)
     return (
       <div style={{height: "0px"}}>
         <input
