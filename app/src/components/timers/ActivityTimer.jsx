@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import timer from "./timer";
 import time from "./time";
 import VeiwTimer from "./veiwTimer";
-import TimeLine from './timeline';
 import { ColorPicker } from "./colorPicker";
 import {clamp} from "./utils";
 
@@ -16,7 +15,7 @@ class ActivityTimer extends Component {
       hour: new Date().getHours(),
       minute: new Date().getMinutes(),
       second: new Date().getSeconds(),
-    }
+    },
   } 
     componentDidMount() {
         this.interval = setInterval(() => {
@@ -24,7 +23,6 @@ class ActivityTimer extends Component {
             this.setState((prevState) => {
                 const timers = prevState.timers.map((timer) => {
                   if (timer.index === this.state.currentTimer) {
-                    console.log(timer.recentTimes)
                     return { ...timer, time: this.findTotalTime(timer.recentTimes)};
                   }
                   return timer;
@@ -221,10 +219,12 @@ class ActivityTimer extends Component {
         second: currentDate.getSeconds(),
       }
       const timers = this.state.timers.map((timer) => {
-        if (timer.recentTimes[timer.recentTimes.length - 1].end == null) {
-          const newTimes = timer.recentTimes;
-          newTimes[timer.recentTimes.length - 1] = {start: newTimes[timer.recentTimes.length - 1].start, end: time}
-          return { ...timer, time: this.findTotalTime(newTimes), recentTimes: newTimes };
+        if(timer.recentTimes.length !== 0) {
+          if (timer.recentTimes[timer.recentTimes.length - 1].end == null) {
+            const newTimes = timer.recentTimes;
+            newTimes[timer.recentTimes.length - 1] = {start: newTimes[timer.recentTimes.length - 1].start, end: time}
+            return { ...timer, time: this.findTotalTime(newTimes), recentTimes: newTimes };
+          }
         }
         return timer;
       });
@@ -240,18 +240,25 @@ class ActivityTimer extends Component {
       // console.log(this.state.timers)
     }
     receiveData = (data) => {
-      this.setState({
-        timers: data.Timers
-      });
+      if(data.Timers != null) {
+        this.setState({
+          timers: data.Timers
+        });
+      }
       console.log(data.Timers);
     }
     render() { 
         const timers = this.state.timers.map((timers) => 
             this.render_Timer(timers)
         );
-        return (
-        <div>
-            {timers}
+        const content = (this.props.validDay !== true) 
+        ? (
+          <div>
+
+          </div> 
+        )
+        : (
+          <React.Fragment>
             <button onClick={this.handleAddTimer} className='addBtn'>
             +        
             </button>
@@ -261,6 +268,12 @@ class ActivityTimer extends Component {
               handleRemoveTimer={this.handleRemoveTimer}
             />
             <button onClick={this.sendData}>Save Workday</button>
+          </React.Fragment>
+        );
+        return (
+        <div>
+            {timers}
+            {content}
         </div>
         );
     }

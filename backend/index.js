@@ -8,13 +8,23 @@ app.use(express.json());
 
 app.post("/create", (req, res) => {
   console.log(req.body);
+  if(req.body.date != null && req.body.userId != null) {
+    const timers = JSON.stringify([]);
+    connection.query("INSERT INTO workdays (userId, date, startTime, endTime, Timers) VALUES (?, ?, ?, ?, ?);", [req.body.userId, req.body.date, '0:00:00', '0:00:00', timers], function(error, results, fields) {
+      if (error) {
+        console.error(error);
+      } else {
+        console.log('Row updated successfully');
+      }
+    });
+  }
   // connection.query('INSERT INTO users (name) VALUES ("BOB");');
 });
 
 
 app.post("/get", (req, res) => {
   console.log(req.body);
-  connection.query("SELECT * FROM workdays WHERE date = '"+ req.body.date +"' AND userId = "+ req.body.userId +";", function(error, results, fields) {
+  connection.query("SELECT * FROM workdays WHERE id = '"+ req.body.id +"' AND userId = "+ req.body.userId +";", function(error, results, fields) {
     if (error) {
       console.error(error);
     } else {
@@ -29,6 +39,7 @@ app.post("/get", (req, res) => {
           Timers: row.Timers,
         });
       } else {
+        res.json(null);
         console.log('No rows found');
       }
     }
@@ -39,7 +50,7 @@ app.post("/get", (req, res) => {
 app.post("/send", (req, res) => {
   console.log(req.body);
   const r = req.body;
-  connection.query("SELECT * FROM workdays WHERE date = '"+ r.date +"' AND userId = "+ r.userId +";", function(error, results, fields) {
+  connection.query("SELECT * FROM workdays WHERE id = '"+ r.id +"' AND userId = "+ r.userId +";", function(error, results, fields) {
     if (error) {
       console.error(error);
     } else {

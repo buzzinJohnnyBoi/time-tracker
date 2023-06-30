@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import './index.css';
-import ActivityTimer from "./components/timers/ActivityTimer";
-import TestComp from "./components/testsend";
 import reportWebVitals from './reportWebVitals';
 import DashBoard from './pages/dashboard';
 import WorkDay from './pages/workday';
